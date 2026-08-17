@@ -168,7 +168,24 @@ async function sendAIMessage(msg){
 
         speakGimmie(answer);
 
+        if(data.action && data.action.type === "navigate"){
+            const button = document.createElement("button");
+
+            button.type = "button";
+            button.className = "gimmie-action";
+            button.textContent = "Open this page →";
+
+            button.onclick = function(){
+                window.location.href = data.action.url;
+            };
+
+            box.appendChild(button);
+            box.scrollTop = box.scrollHeight;
+        }
+
     }catch(err){
+        console.error(err);
+
         typing.textContent =
             "I couldn't connect right now. Please use the Order or Send a Photo page.";
 

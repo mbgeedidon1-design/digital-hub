@@ -34,3 +34,21 @@
         transform:scale(1.02);
     }
 }
+
+.gimmie-action{
+    display:block;
+    width:90%;
+    margin:0 0 12px;
+    padding:10px 12px;
+    border:1px solid #2878ae;
+    border-radius:10px;
+    background:#0b3b6c;
+    color:#fff;
+    font-weight:800;
+    cursor:pointer;
+    text-align:center;
+}
+
+.gimmie-action:hover{
+    background:#0d528f;
+}

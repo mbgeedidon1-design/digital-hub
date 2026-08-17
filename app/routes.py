@@ -29,67 +29,232 @@ def seed_services():
             ("Digital Products","Templates, graphics, software tools and useful downloads.","Various","⬡")]
         db.session.add_all([Service(name=a,description=b,price=c,icon=d) for a,b,c,d in items]); db.session.commit()
 
+def build_gimmie_knowledge():
+    """Build Gimmie's current knowledge from Digital Hub's database."""
+
+    seed_services()
+
+    services = Service.query.filter_by(active=True).all()
+    products = Product.query.order_by(Product.created_at.desc()).limit(30).all()
+
+    service_text = "\n".join(
+        f"- {x.name}: {x.description} Price: {x.price}"
+        for x in services
+    )
+
+    product_text = "\n".join(
+        f"- {x.title}: {x.description} Category: {x.category}"
+        for x in products
+    )
+
+    if not product_text:
+        product_text = "- No digital products are currently listed."
+
+    return services, products, f"""
+DIGITAL HUB
+
+Digital Hub is a digital services platform.
+
+CURRENT SERVICES:
+{service_text}
+
+CURRENT DIGITAL PRODUCTS:
+{product_text}
+
+CUSTOMER PHOTO EDITING WORKFLOW:
+1. Customer opens Send a Photo.
+2. Customer uploads their image.
+3. Customer describes the requested changes.
+4. Digital Hub receives the editing job.
+5. The team edits the image.
+6. Customer can track the job using the tracking link.
+7. When completed, the customer can download the result.
+
+ADMIN WORKFLOW:
+Admins can manage photo-editing jobs, customer orders, services and digital products.
+
+IMPORTANT BUSINESS RULES:
+- Never invent services that Digital Hub does not offer.
+- Never invent prices.
+- Prices shown are starting prices unless explicitly stated otherwise.
+- Do not promise an exact delivery time unless the system provides one.
+- Do not claim a payment was received unless the system confirms it.
+- Do not expose private customer information.
+- Do not expose admin information to normal customers.
+- Do not reveal passwords, API keys, environment variables or internal secrets.
+- Do not tell customers that you performed an action unless the action actually succeeded.
+- If a request requires a human, tell the customer that a Digital Hub team member can assist.
+- For photo editing, direct customers to Send a Photo.
+- For general service requests, direct customers to Order.
+"""
+
 def ai_reply(message):
-    """Free built-in Digital Hub assistant (Gimmie)."""
+    """
+    Gimmie customer assistant.
+
+    Uses live Digital Hub database information and a safe local
+    knowledge layer. No API key is required for this mode.
+    """
+
+    services, products, knowledge = build_gimmie_knowledge()
+
     q = " ".join((message or "").lower().strip().split())
 
     if not q:
         return "Hi! I'm Gimmie 👋 How can I help you today?"
 
-    if any(x in q for x in ["hello", "hi", "hey", "habari", "mambo", "sasa", "greet"]):
-        return ("Hey! 👋 I'm Gimmie, Digital Hub's assistant. "
-                "I can help with photo editing, graphics, websites, software, music, "
-                "digital products, orders and general questions. What do you need?")
+    # Greetings
+    if any(x in q for x in [
+        "hello", "hi", "hey", "habari", "mambo", "sasa"
+    ]):
+        return (
+            "Hey! 👋 I'm Gimmie, the Digital Hub assistant. "
+            "I can help you with photo editing, design, websites, "
+            "software, music, digital products and orders. "
+            "What would you like to do?"
+        )
 
-    if any(x in q for x in ["photo", "picture", "pic", "image", "edit", "editing", "background", "retouch"]):
-        return ("Yes 📸 We can edit your photos. We can help with background removal, "
-                "retouching, social-media graphics and other edits. "
-                "Use **Send a Photo** to upload your picture and tell us exactly what you want changed.")
+    # Identity
+    if any(x in q for x in [
+        "who are you", "what are you", "your name", "gimmie"
+    ]):
+        return (
+            "I'm Gimmie 🤖, Digital Hub's digital assistant. "
+            "I can help customers understand our services, "
+            "start requests, find products and navigate Digital Hub."
+        )
 
-    if any(x in q for x in ["logo", "flyer", "poster", "banner", "thumbnail", "graphic", "design", "invitation"]):
-        return ("🎨 Digital Hub offers logo and graphic design, including flyers, posters, "
-                "banners, thumbnails and invitations. Tell us what you want designed and "
-                "we can help you start an order.")
+    # Photo editing
+    if any(x in q for x in [
+        "photo", "picture", "pic", "image",
+        "photo edit", "edit photo", "edit picture",
+        "background", "retouch"
+    ]):
+        return (
+            "📸 Yes, Digital Hub offers professional photo editing. "
+            "You can send a JPG, PNG, WEBP or other supported image, "
+            "then tell us exactly what you want changed — for example "
+            "background removal, retouching or social-media graphics. "
+            "Tap **Send a Photo** to start."
+        )
 
-    if any(x in q for x in ["website", "web site", "software", "app", "application", "coding", "developer"]):
-        return ("💻 We build websites and custom digital software. "
-                "For a quote, tell us what the website or software should do, "
-                "who will use it, and any important features you need.")
+    # Services
+    if any(x in q for x in [
+        "services", "what do you offer",
+        "what can you do", "service list"
+    ]):
+        names = ", ".join(x.name for x in services)
 
-    if any(x in q for x in ["music", "audio", "song", "sound", "cover art", "podcast"]):
-        return ("🎵 We offer music and audio-related digital services, including audio cleanup, "
-                "cover art and promotional assets. Tell us what you need and we'll guide you.")
+        return (
+            f"✨ Digital Hub currently offers: {names}. "
+            "I can also help you choose the right service."
+        )
 
-    if any(x in q for x in ["price", "cost", "how much", "charge", "fee", "rates", "pricing"]):
-        return ("💰 Our listed starting prices include photo editing from KSh 200, "
-                "digital design from KSh 300, music/audio from KSh 500, "
-                "and websites/software from KSh 2,500. "
-                "The final price depends on the job, so contact us with your requirements for a quote.")
+    # Pricing
+    if any(x in q for x in [
+        "price", "prices", "cost", "how much",
+        "pricing", "rates", "fee", "charge"
+    ]):
+        lines = [
+            f"• {x.name}: {x.price}"
+            for x in services
+        ]
 
-    if any(x in q for x in ["order", "book", "request", "hire", "buy", "purchase"]):
-        return ("📝 You can place a request through the Order page. "
-                "Choose the service, describe what you need and provide your contact details. "
-                "A Digital Hub team member can then follow up with you.")
+        return (
+            "💰 Here are our current starting prices:\n\n"
+            + "\n".join(lines)
+            + "\n\nFinal pricing can depend on the exact requirements."
+        )
 
-    if any(x in q for x in ["track", "tracking", "status", "job number", "request number"]):
-        return ("📦 If you've submitted a photo-editing job, use the tracking link provided after submission "
-                "to check its status and, when ready, access the finished result.")
+    # Design
+    if any(x in q for x in [
+        "logo", "flyer", "poster", "banner",
+        "thumbnail", "invitation", "graphic design"
+    ]):
+        return (
+            "🎨 Digital Hub provides digital design such as logos, "
+            "flyers, posters, banners, thumbnails and invitations. "
+            "Tell me what you want designed and I can guide you to the order."
+        )
 
-    if any(x in q for x in ["digital product", "template", "download", "software product"]):
-        return ("🛒 Check the Digital Store for available digital products such as templates, "
-                "graphics, software tools and other useful downloads.")
+    # Websites/software
+    if any(x in q for x in [
+        "website", "web site", "software",
+        "app", "application", "coding", "developer"
+    ]):
+        return (
+            "💻 We build websites and custom digital software. "
+            "For a quote, tell me what you want to build, who will use it "
+            "and the main features you need."
+        )
 
-    if any(x in q for x in ["human", "person", "support", "agent", "contact", "help me"]):
-        return ("👨‍💻 Of course. If you need a human team member, use the Order page and describe "
-                "what you need, or use the contact information provided by Digital Hub.")
+    # Music
+    if any(x in q for x in [
+        "music", "audio", "song",
+        "sound", "cover art", "podcast"
+    ]):
+        return (
+            "🎵 Digital Hub offers music and audio-related services, "
+            "including audio cleanup, cover art and promotional assets. "
+            "Tell me what you're working on."
+        )
 
-    if any(x in q for x in ["who are you", "what are you", "your name", "gimmie"]):
-        return ("I'm Gimmie 🤖, the Digital Hub assistant. "
-                "I'm here to help customers understand our services and start their requests.")
+    # Products
+    if any(x in q for x in [
+        "product", "products", "store", "shop",
+        "download", "template", "digital product"
+    ]):
+        if products:
+            names = ", ".join(x.title for x in products[:10])
+            return (
+                f"🛒 Our Digital Store currently has: {names}. "
+                "Open the Store to see the available products."
+            )
 
-    return ("I'm Gimmie 🤖. I can help with photo editing, graphic design, "
-            "websites/software, music/audio, digital products, prices and orders. "
-            "Tell me what you need and I'll point you in the right direction.")
+        return (
+            "🛒 The Digital Store is available, but there are currently "
+            "no products listed."
+        )
+
+    # Ordering
+    if any(x in q for x in [
+        "order", "place an order", "book",
+        "hire", "request", "buy"
+    ]):
+        return (
+            "📝 You can start an order by choosing the service you need "
+            "and describing your requirements. I'll help you get to the "
+            "Order page."
+        )
+
+    # Tracking
+    if any(x in q for x in [
+        "track", "tracking", "status",
+        "where is my job", "editing status"
+    ]):
+        return (
+            "📦 If you submitted a photo-editing request, use the tracking "
+            "link you received after submitting it. That link shows the "
+            "current job status and the finished file when it is available."
+        )
+
+    # Human support
+    if any(x in q for x in [
+        "human", "person", "agent",
+        "support", "talk to someone"
+    ]):
+        return (
+            "👨‍💻 Of course. If you need a Digital Hub team member, "
+            "start an Order request and explain what you need."
+        )
+
+    # General fallback
+    return (
+        "I'm Gimmie 🤖. I can help with Digital Hub's current services, "
+        "prices, photo editing, graphic design, websites/software, "
+        "music/audio, digital products, orders and tracking. "
+        "Tell me what you're trying to accomplish and I'll guide you."
+    )
 
 @main.route("/")
 def home():
@@ -132,13 +297,77 @@ def download(filename): return send_from_directory(current_app.config["UPLOAD_FO
 
 @main.route("/api/ai", methods=["POST"])
 def ai_chat():
-    data=request.get_json(silent=True) or {}; message=(data.get("message") or "").strip()
-    if not message: return jsonify(error="Message is required"),400
-    answer=ai_reply(message)
+    data = request.get_json(silent=True) or {}
+    message = (data.get("message") or "").strip()
+
+    if not message:
+        return jsonify(
+            answer="Tell me what you would like help with.",
+            action=None
+        ), 400
+
+    answer = ai_reply(message)
+
+    # Safe customer actions.
+    q = " ".join(message.lower().split())
+    action = None
+
+    if any(x in q for x in [
+        "send photo", "send a photo", "upload photo", "upload a photo",
+        "edit photo", "edit a photo", "photo editing", "picture edit",
+        "edit my picture"
+    ]):
+        action = {
+            "type": "navigate",
+            "url": url_for("main.edit_request")
+        }
+
+    elif any(x in q for x in [
+        "services", "show services", "what do you offer",
+        "your services", "service list"
+    ]):
+        action = {
+            "type": "navigate",
+            "url": url_for("main.services")
+        }
+
+    elif any(x in q for x in [
+        "store", "shop", "digital products", "products",
+        "downloads", "show products"
+    ]):
+        action = {
+            "type": "navigate",
+            "url": url_for("main.shop")
+        }
+
+    elif any(x in q for x in [
+        "order", "place an order", "make an order",
+        "start an order", "hire you", "request a service"
+    ]):
+        action = {
+            "type": "navigate",
+            "url": url_for("main.order")
+        }
+
+    elif any(x in q for x in [
+        "home", "homepage", "go home", "main page"
+    ]):
+        action = {
+            "type": "navigate",
+            "url": url_for("main.home")
+        }
+
     if answer is None:
-        answer=("Hi! I'm Digital Hub's assistant. I can help with photo editing, graphic design, websites/software, "
-                "music/audio and digital products. For a quote, tell me what you need. To send a photo, use the Send a Photo page.")
-    return jsonify(answer=answer)
+        answer = (
+            "I'm Gimmie 🤖. I can help you with Digital Hub services, "
+            "photo editing, design, websites, software, music, products "
+            "and orders."
+        )
+
+    return jsonify(
+        answer=answer,
+        action=action
+    )
 
 @main.route("/admin/login", methods=["GET","POST"])
 def admin_login():
