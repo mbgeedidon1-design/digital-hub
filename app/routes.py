@@ -30,23 +30,66 @@ def seed_services():
         db.session.add_all([Service(name=a,description=b,price=c,icon=d) for a,b,c,d in items]); db.session.commit()
 
 def ai_reply(message):
-    key = os.environ.get("OPENAI_API_KEY")
-    if not key:
-        return None
-    try:
-        from openai import OpenAI
-        client = OpenAI(api_key=key)
-        model = os.environ.get("OPENAI_MODEL", "gpt-5.6")
-        instructions = ("You are Digital Hub's helpful customer assistant. Digital Hub offers photo editing, "
-                        "graphic design, websites/software, music/audio services and digital downloads. "
-                        "Be concise, friendly and transparent. Never invent prices, delivery times, payments, "
-                        "or guarantees. If a customer wants a quote, ask for the service, details and contact. "
-                        "For photo editing, direct them to the Send a Photo page. For human help, say a team member can assist.")
-        response = client.responses.create(model=model, instructions=instructions, input=message)
-        return response.output_text
-    except Exception as e:
-        current_app.logger.exception("Digital Hub AI error: %s", e)
-        return None
+    """Free built-in Digital Hub assistant (Gimmie)."""
+    q = " ".join((message or "").lower().strip().split())
+
+    if not q:
+        return "Hi! I'm Gimmie 👋 How can I help you today?"
+
+    if any(x in q for x in ["hello", "hi", "hey", "habari", "mambo", "sasa", "greet"]):
+        return ("Hey! 👋 I'm Gimmie, Digital Hub's assistant. "
+                "I can help with photo editing, graphics, websites, software, music, "
+                "digital products, orders and general questions. What do you need?")
+
+    if any(x in q for x in ["photo", "picture", "pic", "image", "edit", "editing", "background", "retouch"]):
+        return ("Yes 📸 We can edit your photos. We can help with background removal, "
+                "retouching, social-media graphics and other edits. "
+                "Use **Send a Photo** to upload your picture and tell us exactly what you want changed.")
+
+    if any(x in q for x in ["logo", "flyer", "poster", "banner", "thumbnail", "graphic", "design", "invitation"]):
+        return ("🎨 Digital Hub offers logo and graphic design, including flyers, posters, "
+                "banners, thumbnails and invitations. Tell us what you want designed and "
+                "we can help you start an order.")
+
+    if any(x in q for x in ["website", "web site", "software", "app", "application", "coding", "developer"]):
+        return ("💻 We build websites and custom digital software. "
+                "For a quote, tell us what the website or software should do, "
+                "who will use it, and any important features you need.")
+
+    if any(x in q for x in ["music", "audio", "song", "sound", "cover art", "podcast"]):
+        return ("🎵 We offer music and audio-related digital services, including audio cleanup, "
+                "cover art and promotional assets. Tell us what you need and we'll guide you.")
+
+    if any(x in q for x in ["price", "cost", "how much", "charge", "fee", "rates", "pricing"]):
+        return ("💰 Our listed starting prices include photo editing from KSh 200, "
+                "digital design from KSh 300, music/audio from KSh 500, "
+                "and websites/software from KSh 2,500. "
+                "The final price depends on the job, so contact us with your requirements for a quote.")
+
+    if any(x in q for x in ["order", "book", "request", "hire", "buy", "purchase"]):
+        return ("📝 You can place a request through the Order page. "
+                "Choose the service, describe what you need and provide your contact details. "
+                "A Digital Hub team member can then follow up with you.")
+
+    if any(x in q for x in ["track", "tracking", "status", "job number", "request number"]):
+        return ("📦 If you've submitted a photo-editing job, use the tracking link provided after submission "
+                "to check its status and, when ready, access the finished result.")
+
+    if any(x in q for x in ["digital product", "template", "download", "software product"]):
+        return ("🛒 Check the Digital Store for available digital products such as templates, "
+                "graphics, software tools and other useful downloads.")
+
+    if any(x in q for x in ["human", "person", "support", "agent", "contact", "help me"]):
+        return ("👨‍💻 Of course. If you need a human team member, use the Order page and describe "
+                "what you need, or use the contact information provided by Digital Hub.")
+
+    if any(x in q for x in ["who are you", "what are you", "your name", "gimmie"]):
+        return ("I'm Gimmie 🤖, the Digital Hub assistant. "
+                "I'm here to help customers understand our services and start their requests.")
+
+    return ("I'm Gimmie 🤖. I can help with photo editing, graphic design, "
+            "websites/software, music/audio, digital products, prices and orders. "
+            "Tell me what you need and I'll point you in the right direction.")
 
 @main.route("/")
 def home():
