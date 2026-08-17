@@ -30,7 +30,13 @@
   {% block content %}{% endblock %}
 </main>
 
-<div class="ai-chat" id="aiChat"><button class="ai-toggle" onclick="toggleAI()">✦ Ask Digital Hub AI</button><div class="ai-panel"><div class="ai-head"><b>Digital Hub AI</b><button onclick="toggleAI()">×</button></div><div id="aiMessages" class="ai-messages"><div class="ai-bubble">Hi! I can help you choose a service, understand photo editing, or start an order.</div></div><form onsubmit="sendAI(event)" class="ai-form"><input id="aiInput" placeholder="Ask something…" autocomplete="off"><button>Send</button></form></div></div>
+<div class="ai-chat" id="aiChat"><button class="ai-toggle" onclick="toggleAI()">✦ Ask Digital Hub AI</button><div class="ai-panel"><div class="ai-head"><b>Digital Hub AI</b><button onclick="toggleAI()">×</button></div><div id="aiMessages" class="ai-messages"><div class="ai-bubble">Hi! I can help you choose a service, understand photo editing, or start an order.</div></div><div class="gimmie-voice">
+<button type="button" id="gimmieVoice" onclick="startGimmieVoice()">🎤 Talk to Gimmie</button>
+</div>
+<form onsubmit="sendAI(event)" class="ai-form">
+<input id="aiInput" placeholder="Ask something…" autocomplete="off">
+<button>Send</button>
+</form></div></div>
 
 <footer>
   <div><strong>Digital Hub</strong><br>One place for digital creativity and technology.</div>
