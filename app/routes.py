@@ -44,7 +44,8 @@ def ai_reply(message):
                         "For photo editing, direct them to the Send a Photo page. For human help, say a team member can assist.")
         response = client.responses.create(model=model, instructions=instructions, input=message)
         return response.output_text
-    except Exception:
+    except Exception as e:
+        current_app.logger.exception("Digital Hub AI error: %s", e)
         return None
 
 @main.route("/")
