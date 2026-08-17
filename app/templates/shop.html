@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Digital Store — Digital Hub{% endblock %}
+{% block content %}
+<section class="page-head"><p class="eyebrow">DOWNLOADS</p><h1>Digital Store</h1><p>Software, music, templates and other digital products.</p></section>
+<section class="section"><div class="cards">
+{% for p in products %}
+<article class="card"><small>{{ p.category }}</small><h2>{{ p.title }}</h2><p>{{ p.description }}</p><a class="button" href="{{ url_for('main.download', filename=p.file_name) }}">Download</a></article>
+{% else %}<div class="empty">No products yet. Upload your first product from the admin portal.</div>{% endfor %}
+</div></section>
+{% endblock %}

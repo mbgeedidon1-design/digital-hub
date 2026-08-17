@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Services — Digital Hub{% endblock %}
+{% block content %}
+<section class="page-head"><p class="eyebrow">DIGITAL HUB</p><h1>Services</h1><p>Choose a service or request something custom.</p></section>
+<section class="section"><div class="cards">
+{% for service in services %}
+<article class="card"><div class="icon">{{ service.icon }}</div><h2>{{ service.name }}</h2><p>{{ service.description }}</p><strong>{{ service.price }}</strong><br><br><a class="text-link" href="{{ url_for('main.order', service=service.name) }}">Request →</a></article>
+{% endfor %}
+</div></section>
+{% endblock %}

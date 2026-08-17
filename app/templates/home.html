@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Digital Hub — Digital Services{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <p class="eyebrow">DIGITAL CREATIVITY • TECHNOLOGY • MEDIA</p>
+    <h1>Everything digital.<br><span>One powerful hub.</span></h1>
+    <p class="lead">Photo edits, graphics, websites, software, music and downloadable digital products — built for creators, artists and businesses.</p>
+    <div class="actions">
+      <a class="button" href="{{ url_for('main.order') }}">Start an order</a>
+      <a class="button ghost" href="{{ url_for('main.edit_request') }}">Send a photo</a>
+    </div>
+  </div>
+  <div class="hero-logo"><img src="{{ url_for('static', filename='images/logo.png') }}" alt=""></div>
+</section>
+
+<section class="section">
+  <div class="section-head"><div><p class="eyebrow">WHAT WE DO</p><h2>Digital services that can make money</h2></div><a href="{{ url_for('main.services') }}">View all →</a></div>
+  <div class="cards">
+    {% for service in services %}
+    <article class="card">
+      <div class="icon">{{ service.icon }}</div>
+      <h3>{{ service.name }}</h3>
+      <p>{{ service.description }}</p>
+      <strong>{{ service.price }}</strong>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="split">
+  <div><p class="eyebrow">PHOTO EDITING</p><h2>Just send the picture.</h2><p>Upload your photo, tell us what you want changed, and we handle the editing.</p><a class="button" href="{{ url_for('main.edit_request') }}">Upload a photo</a></div>
+  <div class="panel"><span>01</span><h3>Upload</h3><p>Send your image and instructions.</p><span>02</span><h3>Edit</h3><p>Digital Hub processes your request.</p><span>03</span><h3>Receive</h3><p>Get your finished file.</p></div>
+</section>
+
+
+<section class="trust-section"><div><p class="eyebrow">BUILT FOR TRUST</p><h2>A simple process. Clear communication.</h2><p class="muted">Every photo request gets a tracking number. Your original stays in the admin editing queue, and the finished file is delivered through your private tracking page.</p></div><div class="trust-grid"><div><b>01</b><strong>Submit</strong><span>Send your photo or project.</span></div><div><b>02</b><strong>Track</strong><span>Follow the request status.</span></div><div><b>03</b><strong>Review</strong><span>We work from your instructions.</span></div><div><b>04</b><strong>Receive</strong><span>Download the completed result.</span></div></div></section>
+<section class="section store">
+  <div class="section-head"><div><p class="eyebrow">DIGITAL STORE</p><h2>Software, music & downloads</h2></div><a href="{{ url_for('main.shop') }}">Open store →</a></div>
+  {% if products %}
+  <div class="cards">
+    {% for product in products %}
+    <article class="card"><small>{{ product.category }}</small><h3>{{ product.title }}</h3><p>{{ product.description }}</p><a href="{{ url_for('main.download', filename=product.file_name) }}">Download →</a></article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">Products will appear here after you upload them from the admin portal.</div>
+  {% endif %}
+</section>
+{% endblock %}

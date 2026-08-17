@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Track Request #{{ job.id }} — Digital Hub{% endblock %}
+{% block content %}
+<section class="success-box">
+  <p class="eyebrow">DIGITAL HUB TRACKING</p>
+  <h1>Photo request #{{ job.id }}</h1>
+  <p><strong>{{ job.customer_name }}</strong> · {{ job.created_at.strftime('%d %b %Y, %H:%M') }}</p>
+  <div class="status-line"><span>Status</span><strong>{{ job.status }}</strong></div>
+  <div class="timeline">
+    <div class="step active"><b>1</b><span>Received<br><small>Your photo reached our team.</small></span></div>
+    <div class="step {% if job.status in ['Editing','Completed'] %}active{% endif %}"><b>2</b><span>Editing<br><small>Our editor is working on your request.</small></span></div>
+    <div class="step {% if job.status == 'Completed' %}active{% endif %}"><b>3</b><span>Ready<br><small>Your finished file is available.</small></span></div>
+  </div>
+  {% if job.status == 'Completed' and job.result_file %}<a class="button" href="{{ url_for('main.download', filename=job.result_file) }}">Download finished photo</a>{% else %}<p class="muted">Your finished file will appear here when the edit is completed.</p>{% endif %}
+</section>
+{% endblock %}

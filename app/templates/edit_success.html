@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Photo Received — Digital Hub{% endblock %}
+{% block content %}
+<section class="success-box">
+  <p class="eyebrow">REQUEST RECEIVED</p>
+  <h1>Your photo is safely in the Digital Hub queue.</h1>
+  <p>Keep this tracking link. It lets you check the status and download the finished result when your edit is complete.</p>
+  <div class="tracking"><code>{{ url_for('main.track', token=job.public_token, _external=True) }}</code></div>
+  <a class="button" href="{{ url_for('main.track', token=job.public_token) }}">View request status</a>
+  <p class="small-note">Request #{{ job.id }} · Status: {{ job.status }}</p>
+</section>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Photo Editing — Digital Hub{% endblock %}
+{% block content %}
+<section class="form-wrap">
+  <p class="eyebrow">PHOTO EDITING</p><h1>Send your picture</h1>
+  <p>Upload JPG, PNG or WEBP and explain exactly what you want changed.</p>
+  <form method="post" enctype="multipart/form-data" class="form">
+    <label>Your name<input name="customer_name" required></label>
+    <label>Phone / WhatsApp / Email<input name="contact" required></label>
+    <label>Photo<input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp" required></label>
+    <label>Editing instructions<textarea name="notes" rows="7" placeholder="Example: remove background, improve lighting, add text, make passport style..."></textarea></label>
+    <button class="button">Send photo</button>
+  </form>
+</section>
+{% endblock %}
